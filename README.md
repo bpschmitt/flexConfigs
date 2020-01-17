@@ -1,4 +1,4 @@
-# flexConfigs
+# nri-flex configs
 
 ### All your flexConfigs are belong to us
 
