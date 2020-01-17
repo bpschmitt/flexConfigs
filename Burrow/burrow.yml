@@ -1,0 +1,34 @@
+integrations:
+  - name: nri-flex
+    interval: 60s
+    config:
+      name: Burrow
+      global:
+        base_url: http://localhost:8000/v3/
+      apis:
+        - event_type: kafkaClusterNameSample
+          url: kafka
+          store_lookups:
+            clusters: clusters
+          ignore_output: true
+        - event_type: kafkaConsumerNameSample
+          url: kafka/${lookup:clusters}/consumer
+          store_lookups:
+            consumers: consumers
+          ignore_output: true
+        - event_type: kafkaConsumerGroupLagSample
+          url: kafka/${lookup:clusters}/consumer/${lookup:consumers}/lag
+          strip_keys:
+            - status>partitions
+          rename_keys:
+            status.cluster: cluster
+            status.group: group
+            status.status: status
+        - event_type: kafkaPartitionSample
+          url: kafka/${lookup:clusters}/consumer/${lookup:consumers}/lag
+          inherit_attributes: true
+          start_key:
+            - status
+            - partitions
+          rename_keys:
+            parent.1.cluster: cluster
